@@ -1,35 +1,21 @@
-const express = require('express');
-const cors = require('cors');
-const { db } = require('./db/db');
-
-const {readdirSync} = require('fs')
-const cookiParser = require("cookie-parser");
-const router = require('./routes/transaction');
-
-
-const app = express()
 require('dotenv').config()
+const express = require('express');
+const nodeServer = express();
+const app = require('./App');
+const cors = require("cors")
+
+// CONFIGURING CORS
+nodeServer.use(cors())
+
+//Inject app_server
+nodeServer.use('/',app)
 
 
-const PORT = process.env.PORT
+//Start the Port
+const port=  process.env.PORT || 4001;
+const host = process.env.HOST;
 
-//middlewars
-
-app.use(express.json())
-app.use(cors())
-app.use(cookiParser());
-app.use(router)
-
-//routes
-
-readdirSync('./routes').map((route) => app.use('/api/v1',require('./routes/' + route)))
-
-const server =()=>{
-    db()
-   app.listen(PORT,()=>{
-        console.log('listening to port:',PORT)
-   })
-}
-
-
-server()
+nodeServer.listen(port,()=>{
+    console.log("Node_Server Started on",port);
+    require("./DbConfig");
+})
